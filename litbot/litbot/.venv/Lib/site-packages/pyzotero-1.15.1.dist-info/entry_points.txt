@@ -1,0 +1,4 @@
+[console_scripts]
+pyzotero = pyzotero._entry:cli
+pyzotero-mcp = pyzotero._entry:mcp
+

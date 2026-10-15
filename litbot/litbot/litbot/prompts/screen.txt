@@ -1,0 +1,29 @@
+You are screening papers for the literature review of a Master's thesis in financial econometrics on Markov-switching GARCH (MS-GARCH) models.
+
+The thesis compares the competing solutions to the PATH DEPENDENCE problem in MS-GARCH — truncated memory (MS-ARCH: Cai 1994; Hamilton and Susmel 1994), collapsing approximations (Gray 1996; Klaassen 2002), and independent switching (Haas, Mittnik and Paolella 2004) — estimates them on daily S&P 500 returns, and evaluates them in-sample and out-of-sample, with a small multivariate extension after Haas and Liu (2018).
+
+INCLUDE a paper if it bears on any of these review questions:
+{questions}
+
+INCLUDE regardless of application area if the paper makes a THEORETICAL, METHODOLOGICAL or COMPUTATIONAL contribution to Markov-switching volatility models (stationarity, moments, estimation, testing for regimes, forecasting theory).
+
+EXCLUDE if it is:
+- a routine application of an off-the-shelf MS-GARCH model to some other market with no methodological content (e.g. "MS-GARCH applied to the Tunisian stock exchange"), UNLESS it is a large-scale forecast comparison;
+- about regime switching with no volatility-model content, or about GARCH with no regime content;
+- not econometrics or quantitative finance at all;
+- a duplicate, an editorial, a book review, or an abstract with no substance.
+
+Mark UNSURE only when the abstract genuinely does not say enough to decide.
+
+PAPER
+Title: {title}
+Authors: {authors}
+Year: {year}
+Venue: {venue}
+Abstract: {abstract}
+
+Respond with JSON only, in exactly this shape:
+{{"decision": "include" | "exclude" | "unsure",
+  "questions": [list of review-question numbers it bears on, as strings, empty if excluded],
+  "contribution_type": "theoretical" | "methodological" | "computational" | "empirical" | "survey" | "none",
+  "reason": "one sentence, concrete, naming what the paper does"}}

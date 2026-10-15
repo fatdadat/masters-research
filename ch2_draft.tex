@@ -1,0 +1,80 @@
+% =====================================================================
+% ch2_draft.tex  --  Chapter 2: From ARCH to the persistence puzzle
+% ---------------------------------------------------------------------
+% Status (23 Sep 2026): Sections 2.1 and 2.2 drafted and saved.
+%                       Sections 2.3--2.5 to follow.
+% Budget: 8 pp, ~2,800 words. Running: ~1,130 of 2,800 (about 80 over
+%         the 2.1 + 2.2 targets; to be recovered in 2.5).
+% For \include in the main file. Requires: amsmath, amssymb, bm, bbm,
+%   biblatex (style=apa, backend=biber). Citation keys: see decisions.md.
+% Lines beginning "% SOURCE" give page references for checking; they
+%   do not appear in the compiled text.
+% =====================================================================
+
+\chapter{From ARCH to the persistence puzzle}\label{ch:persistence}
+
+% ---------------------------------------------------------------------
+\section{Volatility clustering and the ARCH model}\label{sec:arch}
+% ---------------------------------------------------------------------
+
+This chapter traces how the econometrics of time-varying volatility arrived at the persistence puzzle that motivates the thesis. Its purpose is not to survey the volatility literature but to show that each step in its development, from ARCH through GARCH to integrated GARCH, sharpened a single question: whether the high persistence estimated for financial volatility is a property of the shocks themselves or of the environment in which they occur.
+
+% SOURCE engle1982 pp. 987--989 (motivation, model)
+The starting point is the objection raised by \textcite{engle1982} to the conventional assumption that the one-period forecast variance is constant. He argued that the uncertainty attached to a forecast can itself be predicted from the recent past. Writing the innovation of the mean equation as $\varepsilon_t = r_t - \mu$, the autoregressive conditional heteroskedasticity (ARCH) model of order $q$ is
+\begin{equation}\label{eq:arch}
+  \varepsilon_t = \sigma_t \eta_t, \qquad
+  \sigma_t^2 = \omega + \sum_{m=1}^{q} a_m \varepsilon_{t-m}^2 ,
+\end{equation}
+where $\omega > 0$, $a_m \ge 0$, and the standardised innovation $\eta_t$ is i.i.d.\ with zero mean and unit variance. Engle takes $\eta_t$ to be Gaussian, so that $\varepsilon_t \mid \mathcal{F}_{t-1} \sim N(0, \sigma_t^2)$.
+
+% SOURCE engle1982 p. 992 (fourth moment), p. 993 (Theorem 2), p. 1000 (LM test)
+The resulting process is serially uncorrelated and has a constant unconditional variance, yet its conditional variance moves with past squared innovations, so that a large shock of either sign raises the variance expected for the periods that follow. Engle shows that the process is covariance stationary if and only if the roots of the characteristic equation associated with the coefficients $a_m$ lie outside the unit circle, in which case the unconditional variance is $\omega / (1 - \sum_{m=1}^{q} a_m)$. He also shows that the fourth moment of even the first-order process exceeds that of a normal variable whenever the ARCH coefficient is non-zero: conditional normality combined with a time-varying variance produces unconditional tails fatter than the normal. To test for ARCH effects he proposes a Lagrange multiplier statistic that requires only least squares residuals: the squared residuals are regressed on a constant and $q$ of their own lags, and $TR^2$ is compared with a $\chi^2_q$ distribution.
+
+% SOURCE engle1982 pp. 1001--1003 (chi2_4 = 15.2; weights 0.4/0.3/0.2/0.1
+%        and rationale; sd of inflation 0.6% -> 1.5%)
+The empirical application already exhibits the difficulty that drove the next development. Using quarterly UK consumer price inflation from 1958:II to 1977:II, Engle found that a test for first-order ARCH was not significant, whereas a test for fourth-order ARCH was ($\chi^2_4 = 15.2$). Rather than estimate four free lag coefficients, he imposed linearly declining weights of 0.4, 0.3, 0.2 and 0.1 on the lagged squared residuals, leaving a single scale parameter to be estimated, on the grounds that the non-negativity and stationarity constraints would probably be difficult to satisfy in an unrestricted model. The fitted model implies that the standard deviation of inflation rose from about 0.6 per cent in the late 1960s to about 1.5 per cent after 1974.
+
+% SOURCE bollerslev1986 pp. 307--308
+The restriction was not peculiar to this application. \textcite{bollerslev1986} observes that most early ARCH applications imposed a similarly arbitrary declining lag structure to capture the long memory typically found in empirical conditional variances, because freely estimated lag distributions often violated non-negativity. Volatility, in other words, appeared to depend on a long and slowly decaying history of shocks, and ARCH could represent that dependence only by fixing its shape in advance. This is the problem the GARCH model was designed to solve, and it is in the GARCH parameterisation that the question of persistence first takes a precise form.
+
+% ---------------------------------------------------------------------
+\section{GARCH(1,1) and the meaning of persistence}\label{sec:garch}
+% ---------------------------------------------------------------------
+
+% SOURCE bollerslev1986 pp. 308--309 (definition, ARMA analogy), eq. 4 p. 309
+Bollerslev resolved the lag-length problem by allowing the conditional variance to depend on its own past as well as on past squared innovations. The step parallels the extension from autoregressive to autoregressive moving average models of the conditional mean: a low-order recursion stands in for a long, slowly decaying lag distribution. The GARCH(1,1) specification, which serves as the single-regime benchmark throughout this thesis, is
+\begin{equation}\label{eq:garch11}
+  \sigma_t^2 = \omega + \alpha\,\varepsilon_{t-1}^2 + \beta\,\sigma_{t-1}^2,
+  \qquad \omega > 0,\ \alpha \ge 0,\ \beta \ge 0,
+\end{equation}
+with $\varepsilon_t = \sigma_t \eta_t$ as in \eqref{eq:arch}. When $\beta < 1$ the recursion can be solved backwards into an ARCH model of infinite order,
+\begin{equation}\label{eq:archinf}
+  \sigma_t^2 = \frac{\omega}{1-\beta} + \alpha \sum_{m=1}^{\infty} \beta^{m-1} \varepsilon_{t-m}^2 ,
+\end{equation}
+% SOURCE haasetal2004 p. 497 (impact / memory / total impact)
+which makes the division of labour between the two coefficients explicit: $\alpha$ measures the immediate effect of a shock on the next period's variance, $\beta$ measures how long that effect is remembered, and the cumulative effect of a unit shock on all future variances is $\alpha/(1-\beta)$ \parencite{haasetal2004}.
+% SOURCE bollerslev1986 pp. 319--322 (alpha 0.135, beta 0.829; vs ARCH(8))
+The empirical example in \textcite{bollerslev1986} illustrates the gain in parsimony. For quarterly US GNP-deflator inflation from 1948 to 1983, two variance coefficients ($\hat\alpha = 0.135$, $\hat\beta = 0.829$) fit slightly better than an eighth-order ARCH model with fixed, linearly declining weights, and the lag structure is estimated from the data rather than imposed.
+
+% SOURCE bollerslev1986 Theorem 1 p. 310; eq. 14 p. 314
+% SOURCE hamiltonsusmel1994 p. 314, eqs. 2.10--2.11 (forecast difference eq.)
+The sum $\alpha + \beta$ is what the literature calls persistence, and three results explain its central role. First, \textcite{bollerslev1986} shows that the process is wide-sense stationary if and only if $\alpha + \beta < 1$, in which case the unconditional variance is $\bar\sigma^2 = \omega / (1 - \alpha - \beta)$. Second, beyond the first lag the autocorrelations of $\varepsilon_t^2$ decay geometrically at rate $\alpha + \beta$, so that the same number governs the memory of the squared process that GARCH is designed to reproduce. Third, the $h$-period-ahead variance forecast follows a first-order difference equation in the horizon with the same decay parameter \parencite{hamiltonsusmel1994}. Since $\sigma_{t+1}^2$ is known at time $t$, this gives
+\begin{equation}\label{eq:garchforecast}
+  \sigma^2_{t+h \mid t} - \bar\sigma^2
+  = (\alpha + \beta)^{h-1} \left( \sigma^2_{t+1} - \bar\sigma^2 \right).
+\end{equation}
+
+% NOTE 36% and 82% are own arithmetic: 0.95^20 and 0.99^20.
+Equation \eqref{eq:garchforecast} states what persistence means in practice: any gap between current volatility and its long-run level is expected to close at rate $\alpha + \beta$ per period. The practical difference between apparently similar values is large. With daily data, one trading month ahead ($h = 21$), a persistence of 0.95 leaves about 36 per cent of today's deviation in the forecast, whereas 0.99 leaves about 82 per cent. Equally important is what \eqref{eq:garch11} rules out. The decay is geometric and governed by a single rate that is fixed over the entire sample, so that every shock, whether a routine news day or a market crash, is expected to fade in the same way.
+
+% SOURCE bollerslev1987 Table 2 p. 545 (LR_{1/nu=0} 10.46--41.26;
+%        S&P 500 Composite 1/nu = 0.139 => nu approx. 7.2); checked on page image
+\textcite{bollerslev1987} extended the model in the direction this thesis follows by letting $\eta_t$ follow a Student-$t$ distribution with $\nu$ degrees of freedom, standardised to unit variance. Conditional normality combined with GARCH dynamics already produces fat unconditional tails, but his results indicate that this is not enough: for daily sterling and Deutschmark exchange rates and five monthly US stock price indices, including the S\&P 500 Composite, the likelihood ratio statistic against conditional normality exceeds conventional $\chi^2_1$ critical values in every case, and for the S\&P 500 the implied degrees of freedom are about seven. The distinction matters for what follows. Fat tails can arise from the conditional distribution or from the variance dynamics, and Chapter~\ref{ch:models} adds a third source in the form of regime mixing, so that the choice of innovation distribution becomes part of the question of where persistence is attributed.
+
+The GARCH(1,1)-$t$ model thus places the entire memory of volatility in a single number, $\alpha + \beta$, held constant across the sample. Whether that number is plausible is an empirical question, and the answer returned by early applications to high-frequency financial data was uncomfortable.
+
+% ---------------------------------------------------------------------
+% \section{The persistence puzzle}\label{sec:puzzle}                [TODO]
+% \section{Regime switching as the alternative account}\label{sec:regimes} [TODO]
+% \section{Two sources of persistence}\label{sec:twosources}         [TODO]
+% ---------------------------------------------------------------------

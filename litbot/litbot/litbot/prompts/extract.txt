@@ -1,0 +1,27 @@
+You are extracting structured information from an academic paper for the evidence table of a Master's thesis literature review on Markov-switching GARCH models.
+
+Work ONLY from the excerpt below. If the excerpt does not state something, write "not stated in excerpt" — never guess, never fill a field with something plausible. Accuracy matters far more than completeness here: every cell will be checked against the paper.
+
+The thesis's review questions:
+{questions}
+
+PAPER
+Title: {title}
+Authors: {authors}
+Year: {year}
+Venue: {venue}
+
+EXCERPT
+{excerpt}
+
+Respond with JSON only, in exactly this shape:
+{{"citation": "Author (Year)",
+  "contribution_type": "theoretical | methodological | computational | empirical | survey",
+  "model_or_result": "the model introduced or the main result, in one line",
+  "path_dependence_treatment": "exact | collapsed | truncated | not applicable | not stated in excerpt",
+  "data_and_sample": "asset/series, frequency, sample period",
+  "headline_finding": "the main empirical or theoretical finding, one or two sentences",
+  "stated_limitation": "a limitation the authors themselves state, or 'none stated in excerpt'",
+  "review_questions": ["numbers of the review questions this paper answers"],
+  "relation_to_core": "extends | contests | applies | supersedes | background — and to which of Cai 1994, Hamilton and Susmel 1994, Gray 1996, Klaassen 2002, Haas et al. 2004, Haas and Liu 2018",
+  "key_claims": ["up to three specific claims a reader should verify against the full paper, each with the section or page if the excerpt gives one"]}}

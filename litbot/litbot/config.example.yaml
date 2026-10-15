@@ -1,0 +1,191 @@
+# litbot configuration — copy to config.yaml and edit.
+
+# Required. Used for the polite API pools of OpenAlex, Crossref and Unpaywall.
+# These services ask for a contact address instead of an API key.
+email: josh.vy.lee@gmail.com
+
+workdir: ./data          # corpus.sqlite, pdfs/ and out/ live here
+
+# Optional. ONLY used to build clickable links in out/manual_fetch.md that you
+# open yourself. The pipeline never sends your credentials anywhere.
+# Find yours in a library database URL, e.g. https://ezproxy.library.usyd.edu.au
+library_proxy_prefix: ""
+
+# Optional: raises the Semantic Scholar rate limit. Free from their site.
+semantic_scholar_api_key: ""
+
+# --------------------------------------------------------------------------- #
+# The review questions. These are injected into the screening and extraction
+# prompts, so the local model knows what "relevant" means for your thesis.
+# --------------------------------------------------------------------------- #
+review_questions:
+  "1": "Why regimes at all — is GARCH's near-integrated persistence real or an artefact of neglected structural change in the unconditional variance?"
+  "2": "How is the path-dependence problem solved — truncated memory, collapsing approximations, or independent switching — and what does each cost?"
+  "3": "What is known theoretically — stationarity, ergodicity, moments, ACF of squares, QML consistency and asymptotic normality?"
+  "4": "How do you test for the number of regimes, given the Davies problem and unidentified nuisance parameters under the null?"
+  "5": "Does it pay off empirically — volatility forecasting, density forecasting, VaR and ES?"
+  "6": "What happens in the multivariate case — regime-dependent correlations, dimensionality, estimation feasibility?"
+
+# --------------------------------------------------------------------------- #
+# Seed papers for citation chasing. Backward = their reference lists; forward =
+# everything that cites them. This is where most of the good material comes
+# from — keyword search alone misses too much.
+# DOIs below marked "verified" were checked against the PDFs or publisher pages;
+# the others resolve by title through OpenAlex at run time.
+# --------------------------------------------------------------------------- #
+seeds:
+  - title: "A Markov Model of Switching-Regime ARCH"
+    doi: "10.1080/07350015.1994.10524546"       # verified
+    backward: true
+    forward: true
+    forward_max: 300
+  - title: "Autoregressive conditional heteroskedasticity and changes in regime"
+    backward: true
+    forward: true
+    forward_max: 400
+  - title: "Modeling the conditional distribution of interest rates as a regime-switching process"
+    backward: true
+    forward: true
+    forward_max: 400
+  - title: "Improving GARCH volatility forecasts with regime-switching GARCH"
+    backward: true
+    forward: true
+    forward_max: 400
+  - title: "A New Approach to Markov-Switching GARCH Models"
+    doi: "10.1093/jjfinec/nbh020"                # verified
+    backward: true
+    forward: true
+    forward_max: 500
+  - title: "A multivariate regime-switching GARCH model with an application to global stock market and real estate equity returns"
+    doi: "10.1515/snde-2016-0019"                # verified
+    backward: true
+    forward: true
+    forward_max: 200
+  - title: "Theory and inference for a Markov switching GARCH model"
+    backward: true
+    forward: true
+    forward_max: 300
+  - title: "Forecasting risk with Markov-switching GARCH models: a large-scale performance study"
+    backward: true
+    forward: true
+    forward_max: 200
+
+# --------------------------------------------------------------------------- #
+# Keyword queries. Each maps to one or more review questions.
+# --------------------------------------------------------------------------- #
+queries:
+  - q: "Markov switching GARCH path dependence"
+    engines: [openalex, crossref]
+  - q: "regime switching GARCH volatility forecasting"
+    engines: [openalex, crossref]
+  - q: "Markov switching GARCH stationarity moments"
+    engines: [openalex]
+  - q: "Markov switching GARCH maximum likelihood estimation"
+    engines: [openalex, crossref]
+  - q: "testing number of regimes Markov switching likelihood ratio nuisance parameters"
+    engines: [openalex]
+  - q: "GARCH persistence structural change spurious IGARCH"
+    engines: [openalex, crossref]
+  - q: "multivariate Markov switching GARCH dynamic correlation regimes"
+    engines: [openalex, crossref]
+  - q: "regime switching value-at-risk expected shortfall backtesting GARCH"
+    engines: [openalex]
+  - q: "mixture GARCH normal mixture conditional distribution"
+    engines: [openalex]
+  - q: "Markov switching GARCH"
+    engines: [arxiv, s2]
+    from_year: 2015
+
+# --------------------------------------------------------------------------- #
+# Deterministic scoring. Costs nothing, runs in a second, and does most of the
+# filtering before the model is asked anything.
+# --------------------------------------------------------------------------- #
+scoring:
+  shortlist_threshold: 10        # only papers at or above this get screened
+  citation_link_weight: 8        # bonus for citing, or being cited by, a seed
+  cited_by_weight: 1.0           # times log(1 + citation count)
+  recency_weight: 1.0
+
+  title_keywords:
+    "markov switching": 8
+    "markov-switching": 8
+    "regime switching": 7
+    "regime-switching": 7
+    "garch": 6
+    "arch": 3
+    "volatility": 3
+    "path dependence": 8
+    "stationarity": 4
+    "value-at-risk": 3
+    "forecast": 3
+    "multivariate": 2
+    "hidden markov": 4
+    "mixture": 3
+
+  abstract_keywords:
+    "markov switching": 3
+    "regime switching": 3
+    "garch": 2
+    "path dependence": 5
+    "conditional variance": 2
+    "volatility persistence": 3
+    "hamilton filter": 4
+    "transition probabilities": 2
+    "quasi-maximum likelihood": 3
+    "ergodicity": 3
+    "model confidence set": 2
+    "expected shortfall": 2
+
+  # Off-topic applications that keyword search drags in. Negative weights.
+  demote_keywords:
+    "electricity price": 6
+    "wind speed": 8
+    "rainfall": 8
+    "tourism": 6
+    "covid-19 cases": 6
+    "epidemi": 6
+    "neural network forecasting of": 3
+    "machine learning approach": 2
+
+  venue_bonus:
+    "journal of econometrics": 5
+    "econometrica": 5
+    "journal of financial econometrics": 5
+    "econometric theory": 4
+    "journal of business & economic statistics": 4
+    "journal of business and economic statistics": 4
+    "journal of applied econometrics": 4
+    "review of economics and statistics": 3
+    "journal of financial economics": 3
+    "econometrics journal": 3
+    "computational statistics & data analysis": 3
+    "international journal of forecasting": 3
+    "studies in nonlinear dynamics": 3
+    "journal of time series analysis": 3
+    "empirical economics": 2
+    "journal of statistical software": 2
+
+# --------------------------------------------------------------------------- #
+# Local model. Nothing here costs money.
+#   ollama pull qwen2.5:7b-instruct     good default, ~5GB
+#   ollama pull llama3.1:8b             fine alternative
+#   ollama pull qwen2.5:14b-instruct    better extraction if you have the RAM
+# --------------------------------------------------------------------------- #
+ollama:
+  host: "http://localhost:11434"
+  model: "qwen2.5:7b-instruct"
+  num_ctx: 8192          # raise to 16384+ for extraction if your RAM allows
+  temperature: 0.0
+  timeout: 600
+  excerpt_chars: 18000   # how much of each PDF the extractor sees
+
+# --------------------------------------------------------------------------- #
+# Zotero. Key from https://www.zotero.org/settings/keys (needs library write).
+# Can also be supplied as ZOTERO_API_KEY / ZOTERO_LIBRARY_ID env vars.
+# --------------------------------------------------------------------------- #
+zotero:
+  library_id: "21517359"
+  library_type: "user"      # or "group"
+  api_key: "inw5Aez2epwAjPLG2jN80Gw7"
+  collection: "MS-GARCH thesis"
+  tags: ["litbot", "msgarch"]
